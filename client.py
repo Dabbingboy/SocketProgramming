@@ -24,11 +24,25 @@ def send(msg):
     client.send(send_length)#                                      hello as b'hello                                                           '
     client.send(message)
     print(client.recv(2048).decode(FORMAT))
-
-print("MESSAGE:",end=' ')
-ip=input("")
+def talk(t_bool):
+    print("To exit talk mode, type 'talk over'")
+    while t_bool:
+        msg=input("MESSAGE: ")
+        message = msg.encode(FORMAT)
+        msg_length =len(message)
+        send_length = str(msg_length).encode(FORMAT)
+        send_length = send_length + b' ' * (HEADER - len(send_length))#encoding space character i.e b' ', to fill out empty spaces in message, hello as'
+        client.send(send_length)#                                      hello as b'hello                                                           '
+        client.send(message)
+        if client.recv(64).decode(FORMAT)=="T4LK_0V3R":
+            t_bool=False
+        else:
+        print(client.recv(64).decode(FORMAT))
+    
+ip=input("MESSAGE:")
 if ip.lower() == 'talk':
     ip == "!TALK"
+    talk()
 send(ip)
 input()#for user to press enter and exit the program
 send(DISCONNECT_MESSAGE)

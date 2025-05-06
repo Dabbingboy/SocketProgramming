@@ -23,14 +23,27 @@ def handle_client(conn, addr):
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
             if msg == TALK_MESSAGE:
-                pass
+                T_bool=True
+                t=threading.Thread(target=talk, args=(conn,addr,T_bool))
+                t.start()
+                t.join()
             if msg == DISCONNECT_MESSAGE:
                 connected = False
             print(f"{addr} {msg.rstrip()}")
             conn.send("MESSAGE RECEIVED".encode(FORMAT))
     conn.close()
     print(f"DISCONNECTING {addr[0]}....")
-    
+def talk(conn,addr,T_bool):
+    while T_bool:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            if msg.lower=="talk over":
+                T_bool=False
+                conn.send("T4LK_0V3R")
+        print(conn[0],' port ',conn[1],':',msg.rstrip())
+        conn.send(input("ENTER: ").encode())
 def start():
     server.listen()
     print(f"LISTENING, the server is listening on {SERVER}")

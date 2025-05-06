@@ -10,40 +10,60 @@ FORMAT = 'utf-8'
 #further converted in binary form.
 DISCONNECT_MESSAGE = "!DISCONNECT"
 TALK_MESSAGE="!TALK"
-
+T_bool=False
 
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)#socket construction
 server.bind(ADDR)
 def handle_client(conn, addr):
+    global T_bool
     print(f"\nNEW CONNECTION {addr} connected.")
     connected = True
     while connected:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
+        message = conn.recv(HEADER).decode(FORMAT)
+        msg_length=len(message)
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
-            if msg == TALK_MESSAGE:
-                T_bool=True
-                t=threading.Thread(target=talk, args=(conn,addr,T_bool))
-                t.start()
-                t.join()
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
             print(f"{addr} {msg.rstrip()}")
             conn.send("MESSAGE RECEIVED".encode(FORMAT))
+            if msg == TALK_MESSAGE:
+                print(msg)
+                T_bool=True
+                talk(conn,addr)
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
+            
     conn.close()
     print(f"DISCONNECTING {addr[0]}....")
-def talk(conn,addr,T_bool):
+def send(conn,msg):
+    message = msg.encode(FORMAT)
+    msg_length =len(message)
+    send_length = str(msg_length).encode(FORMAT)
+    send_length = send_length + b' ' * (HEADER - len(send_length))
+    conn.send(send_length)
+    conn.send(message)
+def receive(conn):
+    global T_bool
+    message = conn.recv(HEADER).decode(FORMAT)
+    msg_length=len(message)
+    if msg_length:
+        msg_length = int(msg_length)
+        msg=conn.recv(HEADER).decode(FORMAT)
+        print(msg)
+        if msg.lower()=='talk over':
+            print(msg.upper())
+        return msg.lower()
+
+def talk(conn,addr):
+    global T_bool
+    print("TALK MODE")
     while T_bool:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode(FORMAT)
-            if msg.lower=="talk over":
-                T_bool=False
-                conn.send("T4LK_0V3R")
-        print(conn[0],' port ',conn[1],':',msg.rstrip())
-        conn.send(input("ENTER: ").encode())
+        if receive(conn)=="talk over":
+            T_bool=False
+            return
+        msg=input("ENTER: ")
+        send(conn,msg)
+    
 def start():
     server.listen()
     print(f"LISTENING, the server is listening on {SERVER}")

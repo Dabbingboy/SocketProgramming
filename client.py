@@ -2,7 +2,7 @@ import socket
 import sys
 HEADER = 64
 PORT = 5050
-SERVER = "192.168.0.101" #SERVER IP
+SERVER = "X.X.X.X" #SERVER IPv4
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 ADDR = (SERVER,PORT)#address format 

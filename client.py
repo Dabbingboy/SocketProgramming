@@ -26,6 +26,9 @@ def send(msg):
     print(client.recv(2048).decode(FORMAT))
 
 print("MESSAGE:",end=' ')
-send(input(""))
+ip=input("")
+if ip.lower() == 'talk':
+    ip == "!TALK"
+send(ip)
 input()#for user to press enter and exit the program
 send(DISCONNECT_MESSAGE)

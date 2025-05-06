@@ -9,6 +9,7 @@ FORMAT = 'utf-8'
 #utf-8 is used to encode because it formats the string into its ascii value,
 #further converted in binary form.
 DISCONNECT_MESSAGE = "!DISCONNECT"
+TALK_MESSAGE="!TALK"
 
 
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)#socket construction
@@ -21,6 +22,8 @@ def handle_client(conn, addr):
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
+            if msg == TALK_MESSAGE:
+                pass
             if msg == DISCONNECT_MESSAGE:
                 connected = False
             print(f"{addr} {msg.rstrip()}")
